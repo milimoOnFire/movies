@@ -1,30 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Slider, Switch } from 'antd';
 import useFetch from './states/useFetch';
+import SearchBar from './components/SearchBar/SearchBar'
 import './App.css';
+import { Input, Card, Row, Col, Layout, Menu, Breadcrumb } from 'antd';
+import SearchResults from './components/SearchResults/SearchResults';
+
+const { Header, Content, Footer } = Layout;
+
+
 
 function App() {
-  const [reverse, setReverse] = useState(true)
-  const handleReverseChange = () => {
-    setReverse(reverse ? false : true)
+  const [moviesData, SetMoviesData] = useState([{}, {}])
+  const [searchQ, setSearchQ] = useState('avengers');
+  useEffect(() => {
+    fetch(`https://api.themoviedb.org/3/search/movie?api_key=cfe422613b250f702980a3bbf9e90716&language=en-US&query=${searchQ}&page=1&include_adult=false`).then(response => response.json())
+      .then(data => {
+        console.log(data.results)
+        SetMoviesData(data.results);
+      });
+  }, [searchQ]);
+  const handleSearch = (event) => {
+    if (event.target.value !== '')
+    setSearchQ(event.target.value)
+    SetMoviesData([{}, {}]);
   }
-  const posts = useFetch('https://s-q7ckzt63ylj7.eu1.wpsandbox.org/wp-json/wp/v2/posts');
-  console.table(posts)
-
+  const style = { background: '#0092ff', padding: '8px 0' };
   return (
-    <div className="App">
-      <div container spacing={2}>
-        {posts?.map((post, index) => (
-          <div item xs={4} key={index}>
-            <div dangerouslySetInnerHTML={{ __html: post.title.rendered }}></div>
-            <div dangerouslySetInnerHTML={{ __html: post.content.rendered }}></div>
-          </div>
-        ))}
-      </div>
-      <Slider defaultValue={30} reverse={true} />
-      <Slider range defaultValue={[20, 50]} reverse={true} />
-        Reversed: <Switch size="small" checked={reverse} onChange={handleReverseChange} />
-    </div>
+    <Layout className="layout">
+      <Header style={{ height: 85 }}><SearchBar searchEvent={handleSearch} /></Header>
+      <Content style={{ padding: '50px 50px' }}>
+        <div className="site-layout-content">
+          <SearchResults moviesData={moviesData}/>
+        </div>
+      </Content>
+      <Footer style={{ textAlign: 'center' }}>Developes by Milad Mohammadi</Footer>
+    </Layout>
   );
 }
 

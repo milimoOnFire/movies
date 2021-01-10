@@ -37,3 +37,9 @@
     transform: rotate(360deg);
   }
 }
+
+.site-layout-content {
+  min-height: 280px;
+  padding: 24px;
+  background: #fff;
+}
